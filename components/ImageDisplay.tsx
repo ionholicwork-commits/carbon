@@ -30,15 +30,15 @@ const ImageDisplay: React.FC<ImageDisplayProps> = ({
   };
 
   return (
-    <div className={`bg-gray-800 p-4 rounded-lg shadow-xl ${className}`}>
-      {title && <h4 className="text-lg font-semibold text-sky-300 mb-3 text-center">{title}</h4>}
+    <div className={`bg-gray-800 p-6 rounded-lg shadow-2xl border border-gray-700 ${className}`}>
+      {title && <h4 className="text-xl font-bold text-sky-300 mb-4 text-center">{title}</h4>}
       <div className="min-h-[200px] flex flex-col justify-center items-center">
         {imageUrl ? (
           <>
-            <img 
-              src={imageUrl} 
-              alt={altText} 
-              className="max-w-full max-h-[400px] h-auto object-contain rounded-md shadow-md" 
+            <img
+              src={imageUrl}
+              alt={altText}
+              className="max-w-full max-h-[400px] h-auto object-contain rounded-md shadow-lg border border-gray-600 animate-scaleIn"
             />
             {downloadFileName && (
               <Button 

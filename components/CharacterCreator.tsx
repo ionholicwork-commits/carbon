@@ -50,17 +50,17 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onComplete }) => {
     otherValue?: string,
     onOtherChange?: (e: React.ChangeEvent<HTMLInputElement>) => void
   ) => (
-    <fieldset className="border border-gray-700 p-4 rounded-lg">
-      <legend className="text-lg font-medium text-sky-300 px-2">{label}</legend>
+    <fieldset className="border-2 border-gray-700 p-5 rounded-lg bg-gray-800 shadow-lg">
+      <legend className="text-lg font-semibold text-sky-300 px-2">{label}</legend>
       <div className="flex flex-wrap gap-2 pt-2">
         {options.map(option => (
-          <label key={option} className={`inline-flex items-center px-4 py-2 rounded-lg cursor-pointer transition-colors ${selectedValue === option ? 'bg-sky-600 text-white shadow-md' : 'bg-gray-700 hover:bg-gray-600'}`}>
+          <label key={option} className={`inline-flex items-center px-4 py-2 rounded-lg cursor-pointer transition-all duration-200 ${selectedValue === option ? 'bg-sky-600 text-white shadow-lg scale-105' : 'bg-gray-700 hover:bg-gray-600 hover:shadow-md'}`}>
             <input type="radio" name={name} value={option} checked={selectedValue === option} onChange={() => onChange(option)} className="hidden" />
             {option}
           </label>
         ))}
         {onOtherChange && (
-           <label className={`inline-flex items-center px-4 py-2 rounded-lg cursor-pointer transition-colors ${selectedValue === '기타' ? 'bg-sky-600 text-white shadow-md' : 'bg-gray-700 hover:bg-gray-600'}`}>
+           <label className={`inline-flex items-center px-4 py-2 rounded-lg cursor-pointer transition-all duration-200 ${selectedValue === '기타' ? 'bg-sky-600 text-white shadow-lg scale-105' : 'bg-gray-700 hover:bg-gray-600 hover:shadow-md'}`}>
              <input type="radio" name={name} value="기타" checked={selectedValue === '기타'} onChange={() => onChange('기타')} className="hidden" />
              기타
            </label>
@@ -72,7 +72,7 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onComplete }) => {
           value={otherValue}
           onChange={onOtherChange}
           placeholder={`${label} 직접 입력`}
-          className="mt-3 w-full p-2 bg-gray-600 border border-gray-500 rounded-md focus:ring-sky-500 focus:border-sky-500 text-gray-200"
+          className="mt-3 w-full p-3 bg-gray-600 border border-gray-500 rounded-md focus:ring-2 focus:ring-sky-400 focus:border-sky-400 text-gray-200 transition-all duration-200 hover:border-gray-400"
           required
         />
       )}
@@ -80,21 +80,21 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onComplete }) => {
   );
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-6 animate-fadeIn">
       <p className="text-center text-gray-300">
         시나리오에 등장할 주인공의 모습을 설정해주세요.
         <br />
         여기서 설정한 모습이 모든 이미지에 일관되게 적용됩니다.
       </p>
       
-      <fieldset className="border border-gray-700 p-4 rounded-lg">
-        <legend className="text-lg font-medium text-sky-300 px-2">주인공 이름 (선택)</legend>
+      <fieldset className="border-2 border-gray-700 p-5 rounded-lg bg-gray-800 shadow-lg">
+        <legend className="text-lg font-semibold text-sky-300 px-2">주인공 이름 (선택)</legend>
         <input
           type="text"
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="이름을 입력하면 시나리오에 반영됩니다."
-          className="mt-2 w-full p-2 bg-gray-700 border border-gray-600 rounded-md focus:ring-sky-500 focus:border-sky-500 text-gray-200 placeholder-gray-500"
+          className="mt-2 w-full p-3 bg-gray-700 border border-gray-600 rounded-md focus:ring-2 focus:ring-sky-400 focus:border-sky-400 text-gray-200 placeholder-gray-500 transition-all duration-200 hover:border-gray-500"
         />
       </fieldset>
 

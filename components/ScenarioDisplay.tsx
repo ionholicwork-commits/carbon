@@ -9,7 +9,7 @@ interface ScenarioDisplayProps {
 
 const ScenarioDisplay: React.FC<ScenarioDisplayProps> = ({ title, text, isLoading, placeholder = "시나리오가 여기에 표시됩니다..." }) => {
   return (
-    <div className="bg-gray-800 p-8 rounded-lg shadow-xl min-h-[200px] h-full flex flex-col">
+    <div className="bg-gray-800 p-8 rounded-lg shadow-2xl border border-gray-700 min-h-[200px] h-full flex flex-col">
       {title && <h3 className="text-2xl font-bold text-sky-400 mb-6 pb-3 border-b-2 border-gray-700 text-center">{title}</h3>}
       <div className="flex-grow overflow-y-auto max-h-[450px]">
         {isLoading ? (

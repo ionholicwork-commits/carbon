@@ -46,7 +46,7 @@ const AIEthicsGuide: React.FC = () => {
   ];
 
   return (
-    <div className="bg-gray-800 border border-gray-600 rounded-lg p-8 w-full" role="region" aria-labelledby="ethics-title">
+    <div className="bg-gray-800 border border-gray-600 rounded-lg p-8 w-full shadow-xl" role="region" aria-labelledby="ethics-title">
       <h3 id="ethics-title" className="text-2xl sm:text-3xl font-bold text-sky-300 mb-8 text-center leading-tight">
         AI 시나리오 생성기 윤리 가이드
       </h3>

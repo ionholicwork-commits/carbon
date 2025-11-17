@@ -362,7 +362,7 @@ const App: React.FC = () => {
     switch (currentPage) {
       case AppPage.INTRODUCTION:
         return (
-          <div className="space-y-8 text-center">
+          <div className="space-y-8 text-center animate-fadeIn">
             <h2 className="text-3xl sm:text-4xl font-bold text-sky-300 leading-tight">탄소 배출 테마의 게임 시나리오 생성기</h2>
             <p className="text-lg sm:text-xl text-gray-300 leading-relaxed">
               탄소 배출 문제를 주제로 한 독창적인 게임 시나리오를 생성하세요.<br />
@@ -400,7 +400,7 @@ const App: React.FC = () => {
         };
 
         return (
-          <div>
+          <div className="animate-fadeIn">
             {/* Top Section: Controls (Left) and Image (Right) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Left Column: Controls */}
@@ -411,20 +411,20 @@ const App: React.FC = () => {
                       <h3 className="text-xl font-bold text-sky-200 border-b-2 border-gray-700 pb-3">1단계: 프롤로그 작성</h3>
                       <div>
                         <label htmlFor="coreTheme" className="block text-base font-semibold text-sky-300 mb-2">게임 핵심 테마 (탄소배출 관련 문제)</label>
-                        <textarea id="coreTheme" value={coreTheme} onChange={(e) => setCoreTheme(e.target.value)} placeholder="예: 해수면 상승으로 인한 도시 침몰" rows={3} disabled={isProcessing} className="w-full p-4 bg-gray-700 border border-gray-600 rounded-md focus:ring-sky-500 focus:border-sky-500 text-gray-200 placeholder-gray-500 leading-relaxed" />
+                        <textarea id="coreTheme" value={coreTheme} onChange={(e) => setCoreTheme(e.target.value)} placeholder="예: 해수면 상승으로 인한 도시 침몰" rows={3} disabled={isProcessing} className="w-full p-4 bg-gray-700 border border-gray-600 rounded-md focus:ring-2 focus:ring-sky-400 focus:border-sky-400 text-gray-200 placeholder-gray-500 leading-relaxed transition-all duration-200 hover:border-gray-500" />
                       </div>
                       <BackgroundSelector profile={background} onChange={setBackground} isProcessing={isProcessing} />
                     </>
                   ) : (
                     <>
                        <h3 className="text-xl font-bold text-sky-200 border-b-2 border-gray-700 pb-3">1단계: 엔딩 작성</h3>
-                      <div className="p-5 bg-gray-700 rounded-md">
+                      <div className="p-5 bg-gradient-to-br from-gray-700 to-gray-800 rounded-lg shadow-lg border border-gray-600">
                         <h3 className="text-lg font-bold text-sky-300 mb-2">현재 엔딩 주제: {currentEnding.title}</h3>
                         <p className="text-base text-gray-300 leading-relaxed">{currentEnding.description}</p>
                       </div>
                       <div>
                         <label htmlFor="userEndingSuggestion" className="block text-base font-semibold text-sky-300 mb-2">(선택) 구체적인 아이디어를 추가해보세요</label>
-                        <textarea id="userEndingSuggestion" value={userEndingSuggestion} onChange={(e) => setUserEndingSuggestion(e.target.value)} placeholder="예: 특정 기술의 발전, 예상치 못한 사회적 변화" rows={3} disabled={isProcessing} className="w-full p-4 bg-gray-700 border border-gray-600 rounded-md focus:ring-sky-500 focus:border-sky-500 text-gray-200 placeholder-gray-500 leading-relaxed" />
+                        <textarea id="userEndingSuggestion" value={userEndingSuggestion} onChange={(e) => setUserEndingSuggestion(e.target.value)} placeholder="예: 특정 기술의 발전, 예상치 못한 사회적 변화" rows={3} disabled={isProcessing} className="w-full p-4 bg-gray-700 border border-gray-600 rounded-md focus:ring-2 focus:ring-sky-400 focus:border-sky-400 text-gray-200 placeholder-gray-500 leading-relaxed transition-all duration-200 hover:border-gray-500" />
                       </div>
                        <BackgroundSelector profile={background} onChange={setBackground} isProcessing={isProcessing} />
                     </>
@@ -521,7 +521,7 @@ const App: React.FC = () => {
 
       case AppPage.FULL_SCENARIO:
         return (
-          <div className="space-y-12">
+          <div className="space-y-12 animate-fadeIn">
             <div>
               <h2 className="text-3xl font-bold text-sky-400 mb-4">게임 핵심 테마</h2>
               <p className="text-base text-gray-300 bg-gray-700 p-4 rounded-md mb-8 leading-relaxed">{coreTheme || "핵심 테마가 설정되지 않았습니다."}</p>
