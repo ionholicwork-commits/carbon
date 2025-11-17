@@ -80,8 +80,8 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onComplete }) => {
   );
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6 animate-fadeIn">
-      <p className="text-center text-gray-300">
+    <form onSubmit={handleSubmit} className="space-y-6 animate-fadeIn" aria-label="캐릭터 프로필 설정">
+      <p className="text-center text-gray-300" id="character-form-description">
         시나리오에 등장할 주인공의 모습을 설정해주세요.
         <br />
         여기서 설정한 모습이 모든 이미지에 일관되게 적용됩니다.
@@ -103,8 +103,12 @@ const CharacterCreator: React.FC<CharacterCreatorProps> = ({ onComplete }) => {
       {renderRadioGroup('국적', 'nationality', CHARACTER_OPTIONS.nationalities, nationality, setNationality, nationalityOther, (e) => setNationalityOther(e.target.value))}
       {renderRadioGroup('의상', 'outfit', CHARACTER_OPTIONS.outfits, outfit, setOutfit, outfitOther, (e) => setOutfitOther(e.target.value))}
       {renderRadioGroup('그림체', 'artStyle', CHARACTER_OPTIONS.artStyles, artStyle, setArtStyle)}
-      
-      {error && <p className="text-red-400 text-sm text-center">{error}</p>}
+
+      {error && (
+        <div role="alert" aria-live="assertive" className="text-red-400 text-sm text-center bg-red-900 bg-opacity-30 p-3 rounded-md border border-red-700">
+          {error}
+        </div>
+      )}
       
       <Button type="submit" size="lg" className="w-full !mt-8">
         설정 완료하고 프롤로그 작성 시작
