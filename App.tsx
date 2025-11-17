@@ -2,11 +2,11 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import { EndingContent, AppPage, ImageState, CharacterProfile, BackgroundProfile } from './types';
 import { APP_TITLE, INITIAL_ENDING_CONTENT, STEPS, INITIAL_BACKGROUND_PROFILE, ENDING_DEFAULT_BACKGROUNDS } from './constants';
-import { 
+import {
   initializeGemini,
-  generatePrologueScenario, 
-  generateEndingScenario, 
-  generateImagePromptInternal, 
+  generatePrologueScenario,
+  generateEndingScenario,
+  generateImagePromptDirect,
   generateImageFromPrompt,
 } from './services/geminiService';
 import Button from './components/Button';
@@ -132,9 +132,9 @@ const App: React.FC = () => {
       setPrologueImage(prev => ({ ...prev, error: "캐릭터 정보가 설정되지 않았습니다. 앱을 새로고침하여 다시 시도해주세요." }));
       return;
     }
-    setPrologueImage({ isLoading: true, isGenerated: false, error: null, url: prologueImage.url, skipped: false }); 
+    setPrologueImage({ isLoading: true, isGenerated: false, error: null, url: prologueImage.url, skipped: false });
     try {
-      const imagePrompt = await generateImagePromptInternal(prologue, 'prologue', characterProfile, background);
+      const imagePrompt = generateImagePromptDirect(prologue, 'prologue', characterProfile, background);
       setPrologueImage(prev => ({ ...prev, prompt: imagePrompt }));
       const imageUrl = await generateImageFromPrompt(imagePrompt);
       setPrologueImage(prev => ({ ...prev, url: imageUrl, isGenerated: true, isLoading: false }));
@@ -223,8 +223,8 @@ const App: React.FC = () => {
     ));
 
     try {
-      const imagePrompt = await generateImagePromptInternal(currentEnding.scenario, 'ending', characterProfile, background, currentEnding.title);
-      setEndings(prev => prev.map((e, i) => 
+      const imagePrompt = generateImagePromptDirect(currentEnding.scenario, 'ending', characterProfile, background, currentEnding.title);
+      setEndings(prev => prev.map((e, i) =>
         i === currentEndingIndex ? { ...e, image: { ...e.image, prompt: imagePrompt } } : e
       ));
 

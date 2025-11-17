@@ -392,6 +392,90 @@ const translateBackgroundToEnglish = (profile: BackgroundProfile) => {
 };
 
 
+// 직접 이미지 프롬프트 생성 (API 호출 없이)
+export const generateImagePromptDirect = (
+  scenarioText: string,
+  scenarioType: 'prologue' | 'ending',
+  characterProfile: CharacterProfile,
+  background: BackgroundProfile,
+  endingTitle?: string
+): string => {
+  const engProfile = translateToEnglish(characterProfile);
+  const engBackground = translateBackgroundToEnglish(background);
+
+  // 기본 캐릭터 설명
+  const characterDesc = `A ${engProfile.age} ${engProfile.nationality} ${engProfile.gender}${characterProfile.name ? ` named ${characterProfile.name}` : ''}, wearing ${engProfile.outfit}`;
+
+  // 안전 지침
+  const safetyNote = "modest, non-revealing, family-friendly clothing";
+
+  // 시나리오 타입별 분위기 설정
+  let sceneDescription = "";
+  let emotionalTone = "";
+  let visualElements = "";
+
+  if (scenarioType === 'prologue') {
+    sceneDescription = "Before the main crisis, showing early warning signs of environmental problems";
+    emotionalTone = "peaceful yet subtly anxious atmosphere";
+    visualElements = "subtle signs of climate change, like unusual weather patterns or environmental anomalies";
+  } else {
+    // 엔딩 타입별 분위기
+    if (endingTitle?.includes('성공')) {
+      sceneDescription = "A future where carbon neutrality has been achieved";
+      emotionalTone = "hopeful, bright, and optimistic atmosphere";
+      visualElements = "clean energy infrastructure, recovered ecosystems, thriving green cities";
+    } else if (endingTitle?.includes('실패')) {
+      sceneDescription = "A dystopian future where carbon emissions caused catastrophic climate disaster";
+      emotionalTone = "dark, desperate, and regretful atmosphere";
+      visualElements = "environmental devastation, extreme weather damage, struggling survivors";
+    } else {
+      sceneDescription = "A conflicted future where climate policies failed due to social unrest";
+      emotionalTone = "tense, uncertain, and melancholic atmosphere";
+      visualElements = "social conflict, abandoned environmental projects, divided communities";
+    }
+  }
+
+  // 캐릭터 표정 및 행동
+  let characterExpression = "";
+  if (scenarioType === 'prologue') {
+    characterExpression = "concerned expression, looking at the changing environment with worry";
+  } else {
+    if (endingTitle?.includes('성공')) {
+      characterExpression = "relieved smile, hopeful eyes gazing at the restored world";
+    } else if (endingTitle?.includes('실패')) {
+      characterExpression = "sorrowful eyes, regretful expression, weary posture";
+    } else {
+      characterExpression = "conflicted emotions, troubled gaze, showing inner turmoil";
+    }
+  }
+
+  // 조명 및 색상
+  let lightingAndColor = "";
+  if (scenarioType === 'prologue') {
+    lightingAndColor = "natural lighting with subtle dramatic shadows";
+  } else {
+    if (endingTitle?.includes('성공')) {
+      lightingAndColor = "vibrant colors, soft golden hour lighting, warm and inviting tones";
+    } else if (endingTitle?.includes('실패')) {
+      lightingAndColor = "muted, desaturated color palette, dramatic high-contrast lighting, dark and gloomy atmosphere";
+    } else {
+      lightingAndColor = "cool tones, overcast lighting, subdued colors reflecting uncertainty";
+    }
+  }
+
+  // 최종 프롬프트 조합
+  const finalPrompt = `${engProfile.artStyle}, ${engBackground.composition}.
+${characterDesc} with ${safetyNote}, ${characterExpression}.
+Setting: ${engBackground.space}, ${engBackground.weather}, ${engBackground.timeOfDay}.
+Scene: ${sceneDescription}.
+Mood: ${engBackground.mood}, ${emotionalTone}.
+Visual elements: ${visualElements}.
+Lighting: ${lightingAndColor}.
+Cinematic composition, highly detailed, professional illustration, focus on environmental storytelling`.replace(/\s+/g, ' ').trim();
+
+  return finalPrompt;
+};
+
 export const generateImagePromptInternal = async (
   scenarioText: string, 
   scenarioType: 'prologue' | 'ending', 
