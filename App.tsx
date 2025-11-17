@@ -19,6 +19,7 @@ import BackgroundSelector from './components/BackgroundSelector';
 import Stepper from './components/Stepper';
 import LoadingOverlay from './components/LoadingOverlay';
 import AIEthicsGuide from './components/AIEthicsGuide';
+import { validateCoreTheme, validateUserSuggestion } from './utils/validation';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<AppPage>(AppPage.INTRODUCTION);
@@ -81,6 +82,21 @@ const App: React.FC = () => {
       setError("게임의 핵심 테마를 입력해주세요.");
       return;
     }
+
+    // 핵심 테마 검증
+    const validationResult = validateCoreTheme(coreTheme);
+    if (!validationResult.valid) {
+      const errorMessage = validationResult.suggestion
+        ? `${validationResult.message}\n\n${validationResult.suggestion}`
+        : validationResult.message || "입력값을 확인해주세요.";
+      setError(errorMessage);
+      return;
+    }
+    // 경고 메시지가 있는 경우 (valid=true이지만 제안이 있는 경우)
+    if (validationResult.message && validationResult.suggestion) {
+      console.warn(validationResult.message, validationResult.suggestion);
+    }
+
     if (!characterProfile) {
       handleError(new Error("캐릭터 정보가 설정되지 않았습니다. 앱을 새로고침하여 다시 시도해주세요."));
       return;
@@ -138,6 +154,23 @@ const App: React.FC = () => {
       setError("오류: 게임 핵심 테마가 설정되지 않았습니다. 프롤로그 생성 페이지로 돌아가 테마를 설정해주세요.");
       return;
     }
+
+    // 사용자 추가 의견 검증 (선택적이므로 값이 있을 때만)
+    if (userEndingSuggestion && userEndingSuggestion.trim()) {
+      const validationResult = validateUserSuggestion(userEndingSuggestion);
+      if (!validationResult.valid) {
+        const errorMessage = validationResult.suggestion
+          ? `${validationResult.message}\n\n${validationResult.suggestion}`
+          : validationResult.message || "입력값을 확인해주세요.";
+        setError(errorMessage);
+        return;
+      }
+      // 경고 메시지가 있는 경우 (valid=true이지만 제안이 있는 경우)
+      if (validationResult.message && validationResult.suggestion) {
+        console.warn(validationResult.message, validationResult.suggestion);
+      }
+    }
+
     if (!characterProfile) {
       handleError(new Error("캐릭터 정보가 설정되지 않았습니다. 앱을 새로고침하여 다시 시도해주세요."));
       return;
