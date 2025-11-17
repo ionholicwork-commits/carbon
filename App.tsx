@@ -2,11 +2,11 @@ import React, { useState, useCallback, useEffect, useMemo } from 'react';
 import * as XLSX from 'xlsx';
 import { EndingContent, AppPage, ImageState, CharacterProfile, BackgroundProfile } from './types';
 import { APP_TITLE, INITIAL_ENDING_CONTENT, STEPS, INITIAL_BACKGROUND_PROFILE, ENDING_DEFAULT_BACKGROUNDS } from './constants';
-import { 
+import {
   initializeGemini,
-  generatePrologueScenario, 
-  generateEndingScenario, 
-  generateImagePromptInternal, 
+  generatePrologueScenario,
+  generateEndingScenario,
+  generateImagePromptDirect,
   generateImageFromPrompt,
 } from './services/geminiService';
 import Button from './components/Button';
@@ -19,6 +19,7 @@ import BackgroundSelector from './components/BackgroundSelector';
 import Stepper from './components/Stepper';
 import LoadingOverlay from './components/LoadingOverlay';
 import AIEthicsGuide from './components/AIEthicsGuide';
+import { validateCoreTheme, validateUserSuggestion } from './utils/validation';
 
 const App: React.FC = () => {
   const [currentPage, setCurrentPage] = useState<AppPage>(AppPage.INTRODUCTION);
@@ -81,6 +82,21 @@ const App: React.FC = () => {
       setError("게임의 핵심 테마를 입력해주세요.");
       return;
     }
+
+    // 핵심 테마 검증
+    const validationResult = validateCoreTheme(coreTheme);
+    if (!validationResult.valid) {
+      const errorMessage = validationResult.suggestion
+        ? `${validationResult.message}\n\n${validationResult.suggestion}`
+        : validationResult.message || "입력값을 확인해주세요.";
+      setError(errorMessage);
+      return;
+    }
+    // 경고 메시지가 있는 경우 (valid=true이지만 제안이 있는 경우)
+    if (validationResult.message && validationResult.suggestion) {
+      console.warn(validationResult.message, validationResult.suggestion);
+    }
+
     if (!characterProfile) {
       handleError(new Error("캐릭터 정보가 설정되지 않았습니다. 앱을 새로고침하여 다시 시도해주세요."));
       return;
@@ -116,9 +132,9 @@ const App: React.FC = () => {
       setPrologueImage(prev => ({ ...prev, error: "캐릭터 정보가 설정되지 않았습니다. 앱을 새로고침하여 다시 시도해주세요." }));
       return;
     }
-    setPrologueImage({ isLoading: true, isGenerated: false, error: null, url: prologueImage.url, skipped: false }); 
+    setPrologueImage({ isLoading: true, isGenerated: false, error: null, url: prologueImage.url, skipped: false });
     try {
-      const imagePrompt = await generateImagePromptInternal(prologue, 'prologue', characterProfile, background);
+      const imagePrompt = generateImagePromptDirect(prologue, 'prologue', characterProfile, background);
       setPrologueImage(prev => ({ ...prev, prompt: imagePrompt }));
       const imageUrl = await generateImageFromPrompt(imagePrompt);
       setPrologueImage(prev => ({ ...prev, url: imageUrl, isGenerated: true, isLoading: false }));
@@ -138,6 +154,23 @@ const App: React.FC = () => {
       setError("오류: 게임 핵심 테마가 설정되지 않았습니다. 프롤로그 생성 페이지로 돌아가 테마를 설정해주세요.");
       return;
     }
+
+    // 사용자 추가 의견 검증 (선택적이므로 값이 있을 때만)
+    if (userEndingSuggestion && userEndingSuggestion.trim()) {
+      const validationResult = validateUserSuggestion(userEndingSuggestion);
+      if (!validationResult.valid) {
+        const errorMessage = validationResult.suggestion
+          ? `${validationResult.message}\n\n${validationResult.suggestion}`
+          : validationResult.message || "입력값을 확인해주세요.";
+        setError(errorMessage);
+        return;
+      }
+      // 경고 메시지가 있는 경우 (valid=true이지만 제안이 있는 경우)
+      if (validationResult.message && validationResult.suggestion) {
+        console.warn(validationResult.message, validationResult.suggestion);
+      }
+    }
+
     if (!characterProfile) {
       handleError(new Error("캐릭터 정보가 설정되지 않았습니다. 앱을 새로고침하여 다시 시도해주세요."));
       return;
@@ -190,8 +223,8 @@ const App: React.FC = () => {
     ));
 
     try {
-      const imagePrompt = await generateImagePromptInternal(currentEnding.scenario, 'ending', characterProfile, background, currentEnding.title);
-      setEndings(prev => prev.map((e, i) => 
+      const imagePrompt = generateImagePromptDirect(currentEnding.scenario, 'ending', characterProfile, background, currentEnding.title);
+      setEndings(prev => prev.map((e, i) =>
         i === currentEndingIndex ? { ...e, image: { ...e.image, prompt: imagePrompt } } : e
       ));
 
