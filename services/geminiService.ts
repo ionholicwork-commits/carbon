@@ -420,15 +420,16 @@ export const generateImagePromptDirect = (
     visualElements = "subtle signs of climate change, like unusual weather patterns or environmental anomalies";
   } else {
     // 엔딩 타입별 분위기
-    if (endingTitle?.includes('성공')) {
+    if (endingTitle?.includes('탄소중립 성공') || endingTitle?.includes('탄소 중립 성공')) {
       sceneDescription = "A future where carbon neutrality has been achieved";
       emotionalTone = "hopeful, bright, and optimistic atmosphere";
       visualElements = "clean energy infrastructure, recovered ecosystems, thriving green cities";
-    } else if (endingTitle?.includes('실패')) {
+    } else if (endingTitle?.includes('탄소 중립 실패') || endingTitle?.includes('탄소중립 실패')) {
       sceneDescription = "A dystopian future where carbon emissions caused catastrophic climate disaster";
       emotionalTone = "dark, desperate, and regretful atmosphere";
       visualElements = "environmental devastation, extreme weather damage, struggling survivors";
     } else {
+      // 행복도 관리 실패
       sceneDescription = "A conflicted future where climate policies failed due to social unrest";
       emotionalTone = "tense, uncertain, and melancholic atmosphere";
       visualElements = "social conflict, abandoned environmental projects, divided communities";
@@ -440,11 +441,12 @@ export const generateImagePromptDirect = (
   if (scenarioType === 'prologue') {
     characterExpression = "concerned expression, looking at the changing environment with worry";
   } else {
-    if (endingTitle?.includes('성공')) {
+    if (endingTitle?.includes('탄소중립 성공') || endingTitle?.includes('탄소 중립 성공')) {
       characterExpression = "relieved smile, hopeful eyes gazing at the restored world";
-    } else if (endingTitle?.includes('실패')) {
+    } else if (endingTitle?.includes('탄소 중립 실패') || endingTitle?.includes('탄소중립 실패')) {
       characterExpression = "sorrowful eyes, regretful expression, weary posture";
     } else {
+      // 행복도 관리 실패
       characterExpression = "conflicted emotions, troubled gaze, showing inner turmoil";
     }
   }
@@ -454,11 +456,12 @@ export const generateImagePromptDirect = (
   if (scenarioType === 'prologue') {
     lightingAndColor = "natural lighting with subtle dramatic shadows";
   } else {
-    if (endingTitle?.includes('성공')) {
+    if (endingTitle?.includes('탄소중립 성공') || endingTitle?.includes('탄소 중립 성공')) {
       lightingAndColor = "vibrant colors, soft golden hour lighting, warm and inviting tones";
-    } else if (endingTitle?.includes('실패')) {
+    } else if (endingTitle?.includes('탄소 중립 실패') || endingTitle?.includes('탄소중립 실패')) {
       lightingAndColor = "muted, desaturated color palette, dramatic high-contrast lighting, dark and gloomy atmosphere";
     } else {
+      // 행복도 관리 실패
       lightingAndColor = "cool tones, overcast lighting, subdued colors reflecting uncertainty";
     }
   }
@@ -611,8 +614,7 @@ export const generateImageFromPrompt = async (
       const reason = textPart?.text ? `모델 응답: ${textPart.text}` : "응답에서 이미지 데이터를 찾을 수 없습니다.";
       return Promise.reject(new Error(`이미지 생성에 실패했습니다. ${reason}`));
     }
-  } catch (error)
- {
+  } catch (error) {
     console.error("Error calling Gemini API for image generation:", error);
      if (error instanceof Error) {
       return Promise.reject(new Error(`Gemini API 이미지 생성 중 오류 발생: ${error.message}`));
