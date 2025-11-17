@@ -107,6 +107,41 @@ function getAgeAppropriateContext(age: string) {
   return contexts[age] || contexts['청소년'];
 }
 
+// 헬퍼 함수: 엔딩별 시간 정보 계산
+function getEndingTimeInfo(endingType: EndingType, prologueAge: string) {
+  // 연령대별 엔딩 시나리오에서의 나이 진행
+  type AgeKey = 'success' | 'failure' | 'conflict';
+  const ageProgression: Record<string, Record<AgeKey, string>> = {
+    '어린이': { success: '청년', failure: '청년', conflict: '청소년' },
+    '청소년': { success: '중년', failure: '중년', conflict: '청년' },
+    '청년': { success: '중년', failure: '중년', conflict: '청년' },
+    '중년': { success: '노년', failure: '노년', conflict: '중년' },
+    '노년': { success: '노년', failure: '노년', conflict: '노년' }
+  };
+
+  // 엔딩 타입별 경과 시간 (평균값)
+  const yearsLater: Record<EndingType, number> = {
+    [EndingType.CARBON_NEUTRALITY_SUCCESS]: 27,
+    [EndingType.CARBON_NEUTRALITY_FAILURE]: 17,
+    [EndingType.RESIDENT_HAPPINESS_FAILURE]: 7
+  };
+
+  // 엔딩 타입을 ageKey로 매핑
+  const ageMap: Record<EndingType, AgeKey> = {
+    [EndingType.CARBON_NEUTRALITY_SUCCESS]: 'success',
+    [EndingType.CARBON_NEUTRALITY_FAILURE]: 'failure',
+    [EndingType.RESIDENT_HAPPINESS_FAILURE]: 'conflict'
+  };
+
+  const ageKey = ageMap[endingType];
+  const currentAge = ageProgression[prologueAge]?.[ageKey] || prologueAge;
+
+  return {
+    yearsLater: yearsLater[endingType],
+    currentAge: currentAge
+  };
+}
+
 export const generatePrologueScenario = async (
   coreTheme: string,
   characterProfile: CharacterProfile,
@@ -220,41 +255,95 @@ export const generateEndingScenario = async (
   userSuggestion?: string
 ): Promise<string> => {
   const endingDetail = ENDING_DETAILS[endingType];
-  const prompt = `
-당신은 숙련된 게임 시나리오 작가입니다. 아래 제공된 프롤로그와 게임의 핵심 테마에 이어지는 특정 엔딩 시나리오를 작성해주세요.
+  const timeInfo = getEndingTimeInfo(endingType, characterProfile.age);
+  const ageContext = getAgeAppropriateContext(timeInfo.currentAge);
 
-게임의 핵심 테마: "${coreTheme}"
+  const prompt = `
+당신은 중고등학생을 위한 교육용 시나리오 작가입니다.
+아래 제공된 프롤로그와 게임의 핵심 테마에 이어지는 특정 엔딩 시나리오를 작성해주세요.
+
+## 게임의 핵심 테마
+"${coreTheme}"
+
 이 핵심 테마가 엔딩 시나리오 전반에 걸쳐 중요한 배경이자 영향을 미치는 요소로 반영되어야 합니다.
 
-주인공 정보:
--   ${characterProfile.name ? `이름: "${characterProfile.name}". 이 이름을 시나리오에 자연스럽게 사용해주세요.` : '이름이 정해지지 않았습니다. 이름 없이 서술해주세요.'}
--   성별: ${characterProfile.gender}, 나이: ${characterProfile.age}, 국적: ${characterProfile.nationality}, 의상: ${characterProfile.outfit}
+## 시간 진행
+- **${timeInfo.yearsLater}년 후**의 미래 상황
+- 프롤로그 캐릭터의 나이: ${characterProfile.age} → **${timeInfo.currentAge}** (${ageContext.description})
 
-기존 프롤로그:
+## 주인공 정보
+-   ${characterProfile.name ? `이름: "${characterProfile.name}". 이 이름을 시나리오에 자연스럽게 사용해주세요.` : '이름이 정해지지 않았습니다. 이름 없이 서술해주세요.'}
+-   현재 연령대: **${timeInfo.currentAge}** (${ageContext.description})
+-   성별: ${characterProfile.gender}
+-   국적: ${characterProfile.nationality}
+
+## 교육 목표
+이 엔딩을 통해 학생들이 다음을 이해하도록 해야 합니다:
+- 선택과 행동의 결과 (인과관계)
+- 탄소중립 문제의 복잡성
+- 미래에 대한 책임감
+
+## 기존 프롤로그
 ---
 ${prologue}
 ---
 
-배경 설정 (이 설정을 시나리오에 자연스럽게 녹여내어 묘사해주세요):
+## 배경 설정
 -   공간: ${background.space}
 -   날씨: ${background.weather}
 -   시간대: ${background.timeOfDay}
 -   분위기: ${background.mood}
 
-작성할 엔딩의 상세 내용 (이것이 주요 지시사항입니다):
-1.  엔딩 제목: "${endingDetail.title}"
-2.  엔딩 지시사항: "${endingDetail.promptInfo}" 
+이 배경이 ${timeInfo.yearsLater}년 후 어떻게 변화했는지 자연스럽게 묘사하세요.
 
-${userSuggestion ? `사용자 추가 구체화 의견: "${userSuggestion}"\n위 엔딩 지시사항에 이 의견을 창의적으로 통합하여 엔딩을 더욱 풍부하게 만들어주세요.` : ''}
+## 엔딩 유형: ${endingDetail.title}
 
-요청사항:
--   엔딩은 프롤로그의 내용과 분위기를 자연스럽게 이어받아야 합니다. 프롤로그에서 시작된 사건들이 어떤 과정을 거쳐 이 엔딩에 도달하게 되었는지, 그 인과관계를 설득력 있게 보여주어야 합니다.
--   지정된 엔딩 지시사항과 게임의 핵심 테마, 그리고 사용자의 추가 의견(제공된 경우)을 충실히 반영하여, 그 결과가 만들어내는 상황과 감정을 심도 있게 묘사해주세요.
--   중요: 시나리오 본문에는 '${endingDetail.title}'과 같은 엔딩 제목이나 '성공', '실패' 같은 직접적인 단어를 사용하지 마세요. 상황 묘사를 통해 자연스럽게 엔딩의 분위기를 전달해야 합니다.
--   엔딩은 플레이어에게 깊은 여운을 남기는, 명확하고 완결성 있는 결말을 제공해야 합니다.
--   구조: 반드시 2개의 문단으로 상황을 묘사한 뒤, 마지막에 그 엔딩의 감정을 함축하는 별도의 한 줄짜리 핵심 대사를 추가하여 마무리해주세요. (총 2문단 + 1줄 대사)
--   분량: 전체 글자 수는 400자 이내로 매우 간결하게 작성해주세요.
--   응답은 반드시 한국어로 작성해주세요. 해당 엔딩 시나리오 텍스트만 응답으로 제공해주세요.
+### 상세 지침
+${endingDetail.promptInfo}
+
+${userSuggestion ? `
+### 사용자 추가 아이디어
+"${userSuggestion}"
+
+**주의**: 위 아이디어를 반영하되, 반드시 탄소 배출 및 '${coreTheme}' 테마와 연결되도록 하세요.
+탄소 문제와 무관한 내용(외계인, 마법, 핵전쟁 등)은 배제하고, 현실적이고 과학적 근거에 기반한 시나리오를 작성하세요.
+` : ''}
+
+## 작성 지침
+
+### 1. 프롤로그와의 연속성
+- 프롤로그의 전조 증상이 ${timeInfo.yearsLater}년 후 어떻게 발전했는지 명확히 연결
+- 인과관계를 설득력 있게 제시
+- 캐릭터의 나이 변화 반드시 반영: ${characterProfile.age} → ${timeInfo.currentAge} (${ageContext.description})
+
+### 2. 엔딩 분위기
+- **중요**: 시나리오 본문에 "${endingDetail.title}", "성공", "실패" 같은 직접적 단어 사용 금지
+- 상황 묘사를 통해 자연스럽게 분위기 전달
+
+### 3. 구조 및 분량
+
+**[문단 1]** (150-200자)
+- ${timeInfo.yearsLater}년 후의 세계 모습
+- '${coreTheme}' 문제의 현재 상태
+- 프롤로그와 비교되는 변화
+
+**[문단 2]** (150-200자)
+- 캐릭터의 현재 모습과 감정
+- 다른 인물과의 대화 (엔딩 주제 반영)
+- 엔딩에 맞는 감정 표현 (성취감/후회/갈등)
+
+**[핵심 대사]** (30자 이내, 따옴표로 묶기)
+- 엔딩의 감정을 함축하는 한 줄
+
+### 4. 출력 형식
+- 한국어로 작성
+- 엔딩 시나리오 텍스트만 출력 (다른 설명 없이)
+- 총 400자 이내
+- 문단 구분은 줄바꿈으로 표시
+
+---
+
+위 지침을 따라 ${endingDetail.title} 엔딩을 작성해주세요.
   `;
   return generateTextWithGemini(prompt);
 };
