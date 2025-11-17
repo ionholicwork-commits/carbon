@@ -74,174 +74,35 @@ const generateTextWithGemini = async (prompt: string): Promise<string> => {
 };
 
 
-// 헬퍼 함수: 연령별 맥락 제공
-function getAgeAppropriateContext(age: string) {
-  const contexts: Record<string, { description: string; naturalExpression: string; perspective: string }> = {
-    '어린이': {
-      description: '초등학생',
-      naturalExpression: '"초등학생", "어린"',
-      perspective: '학교 수업, 부모님과의 대화, 친구들과의 놀이 중심'
-    },
-    '청소년': {
-      description: '중고등학생',
-      naturalExpression: '"중학생", "고등학생"',
-      perspective: '학교 교육, 미래에 대한 불안, 또래 친구들과의 고민 중심'
-    },
-    '청년': {
-      description: '대학생 또는 사회 초년생',
-      naturalExpression: '"대학생", "직장인", "청년"',
-      perspective: '진로 고민, 취업 문제, 미래 설계에 대한 불안 중심'
-    },
-    '중년': {
-      description: '40-50대',
-      naturalExpression: '"중년의", "40대", "가장"',
-      perspective: '자녀 세대의 미래에 대한 걱정, 사회적 책임감 중심'
-    },
-    '노년': {
-      description: '60대 이상',
-      naturalExpression: '"은퇴한", "할머니/할아버지", "노인"',
-      perspective: '과거와의 비교, 후회, 젊은 세대에 대한 미안함 중심'
-    }
-  };
-
-  return contexts[age] || contexts['청소년'];
-}
-
-// 헬퍼 함수: 엔딩별 시간 정보 계산
-function getEndingTimeInfo(endingType: EndingType, prologueAge: string) {
-  // 연령대별 엔딩 시나리오에서의 나이 진행
-  type AgeKey = 'success' | 'failure' | 'conflict';
-  const ageProgression: Record<string, Record<AgeKey, string>> = {
-    '어린이': { success: '청년', failure: '청년', conflict: '청소년' },
-    '청소년': { success: '중년', failure: '중년', conflict: '청년' },
-    '청년': { success: '중년', failure: '중년', conflict: '청년' },
-    '중년': { success: '노년', failure: '노년', conflict: '중년' },
-    '노년': { success: '노년', failure: '노년', conflict: '노년' }
-  };
-
-  // 엔딩 타입별 경과 시간 (평균값)
-  const yearsLater: Record<EndingType, number> = {
-    [EndingType.CARBON_NEUTRALITY_SUCCESS]: 27,
-    [EndingType.CARBON_NEUTRALITY_FAILURE]: 17,
-    [EndingType.RESIDENT_HAPPINESS_FAILURE]: 7
-  };
-
-  // 엔딩 타입을 ageKey로 매핑
-  const ageMap: Record<EndingType, AgeKey> = {
-    [EndingType.CARBON_NEUTRALITY_SUCCESS]: 'success',
-    [EndingType.CARBON_NEUTRALITY_FAILURE]: 'failure',
-    [EndingType.RESIDENT_HAPPINESS_FAILURE]: 'conflict'
-  };
-
-  const ageKey = ageMap[endingType];
-  const currentAge = ageProgression[prologueAge]?.[ageKey] || prologueAge;
-
-  return {
-    yearsLater: yearsLater[endingType],
-    currentAge: currentAge
-  };
-}
-
 export const generatePrologueScenario = async (
   coreTheme: string,
   characterProfile: CharacterProfile,
   background: BackgroundProfile
 ): Promise<string> => {
-  const ageContext = getAgeAppropriateContext(characterProfile.age);
-
   const prompt = `
-당신은 중고등학생을 위한 교육용 시나리오 작가입니다.
-탄소 배출 문제를 주제로 한 게임의 프롤로그를 작성해주세요.
+당신은 숙련된 게임 시나리오 작가입니다. 탄소 배출 문제를 주제로 한 게임의 프롤로그를 작성해주세요.
 
-## 교육 목표
-학생들이 다음을 이해하도록 해야 합니다:
-1. '${coreTheme}' 문제와 탄소 배출의 구체적 인과관계
-2. 문제의 조기 경보 신호를 인식하는 능력
-3. 일상생활과 환경 문제의 연결성
+주요 설정:
+1.  게임의 핵심 테마 (탄소 배출 관련): "${coreTheme}"
+2.  주인공 정보:
+    -   ${characterProfile.name ? `이름: "${characterProfile.name}". 이 이름을 시나리오에 자연스럽게 사용해주세요.` : '이름이 정해지지 않았습니다. 이름 없이 서술해주세요.'}
+    -   성별: ${characterProfile.gender}, 나이: ${characterProfile.age}, 국적: ${characterProfile.nationality}, 의상: ${characterProfile.outfit}
 
-## 주요 설정
-
-### 게임의 핵심 테마
-"${coreTheme}"
-
-**중요**: 이 문제가 발생하게 된 탄소 배출 원인을 프롤로그에서 반드시 설명하세요.
-- 탄소 배출 → 환경 변화 → 문제 발생의 인과관계를 중고등학생이 이해할 수 있도록 구체적으로 서술
-- 과학적 근거를 간단명료하게 포함 (예: 화석연료 → 온실가스 → 기온상승 → 해수면 상승)
-
-### 주인공 정보
--   ${characterProfile.name ? `이름: "${characterProfile.name}". 이 이름을 시나리오에 자연스럽게 사용해주세요.` : '이름이 정해지지 않았습니다. 이름 없이 서술해주세요.'}
--   연령대: ${characterProfile.age} (${ageContext.description})
--   성별: ${characterProfile.gender}
--   국적: ${characterProfile.nationality}
-
-**캐릭터 표현 지침**:
-- 구체적 나이("열다섯 살")보다 ${ageContext.naturalExpression} 같은 자연스러운 표현 사용
-- 이 연령대의 관점과 맥락을 반영: ${ageContext.perspective}
-
-### 배경 설정
+배경 설정 (이 설정을 시나리오에 자연스럽게 녹여내어 묘사해주세요):
 -   공간: ${background.space}
 -   날씨: ${background.weather}
 -   시간대: ${background.timeOfDay}
 -   분위기: ${background.mood}
 
-이 배경이 탄소 배출 문제로 인해 어떻게 변화했는지 자연스럽게 묘사하세요.
-
-## 프롤로그 작성 지침
-
-### 1. 탄소배출 연관성 (최우선)
-- '${coreTheme}' 문제의 **원인**이 탄소 배출임을 명확히 연결
-- 구체적 인과관계: 탄소배출 → 온실효과 → 기후변화 → ${coreTheme}
-- 과학적이면서도 중고등학생이 이해 가능한 수준
-
-### 2. 전조 증상 묘사
-문제가 본격화되기 이전, 다음 신호들이 나타나는 상황 묘사:
-- **환경적 신호**: 평소와 다른 기후, 온도, 생태계 변화
-- **사회적 신호**: 뉴스 보도, 전문가 경고, 정책 논의
-- **일상적 변화**: 캐릭터가 직접 느끼는 변화 (비용 증가, 불편함 등)
-
-### 3. 구조 및 분량
-반드시 아래 형식을 따르세요:
-
-**[문단 1]** (150-200자)
-- 시간, 장소, 날씨 등 배경 설정
-- 핵심 테마 관련 환경 변화 묘사
-- 이 변화가 탄소 배출로 인한 것임을 암시하는 내용 포함
-
-**[문단 2]** (150-200자)
-- 전조 증상에 대한 캐릭터의 인식과 반응
-- 주변 인물과의 대화 (탄소 문제 또는 환경 변화 언급)
-- 불안감, 우려, 고민 표현
-
-**[핵심 대사]** (30자 이내, 따옴표로 묶기)
-- 긴장감을 높이고 탄소 문제를 환기시키는 한 줄
-- 미래에 대한 우려나 질문 형태
-
-### 4. 톤 및 스타일
-- 중고등학생 수준에서 이해 가능
-- 교육적이면서도 흥미로운 서사
-- 과도한 공포 조장 없이 문제의식 전달
-- 다음 엔딩으로 이어질 궁금증 유발
-
-### 5. 출력 형식
-- 한국어로 작성
-- 프롤로그 텍스트만 출력 (다른 설명 없이)
-- 총 400자 이내
-- 문단 구분은 줄바꿈으로 표시
-
-## 예시 (참고용)
-
-[문단 1]
-2035년 여름, 부산 해운대의 백사장은 3년 전보다 50미터나 좁아져 있었다. 중학생 민지는 뉴스에서 들었던 '온실가스로 인한 해수면 상승'이 현실이 되어가는 걸 느꼈다. 에어컨 없는 교실 기온은 42도를 넘었고, 선생님은 '화석연료 사용 감축' 얘기를 또 꺼냈다.
-
-[문단 2]
-민지의 아버지는 공장에서 일했지만, 최근 탄소배출 규제로 조업이 줄었다며 한숨을 쉬었다. SNS에는 매일 남태평양 섬나라 침수 영상이 올라왔다. '탄소 배출을 줄이지 않으면 우리도 저렇게 될까?' 민지는 친구에게 물었지만, 아무도 확실한 답을 주지 못했다.
-
-[핵심 대사]
-"이대로 가다간... 우리 도시도 바다에 잠길지 몰라."
-
----
-
-위 지침을 따라 프롤로그를 작성해주세요.
+프롤로그 작성 지침:
+-   핵심 테마와 관련된 문제가 아직 본격적으로 발생하기 이전, 위험을 감지할 수 있는 전조 증상들이 나타나는 상황을 묘사해주세요.
+-   프롤로그는 탄소 배출 문제가 평범한 사람들의 일상에 어떻게 미묘하게 영향을 미치기 시작하는지를 보여주어, 플레이어가 감정적으로 몰입할 수 있도록 해주세요.
+-   등장인물이 이러한 전조 증상을 발견하거나, 다른 누군가가 위험에 대해 경고하는 상황을 포함할 수 있습니다.
+-   플레이어의 흥미를 유발하고 게임 세계관의 배경과 주요 갈등을 암시해야 합니다.
+-   이야기의 결말을 암시하지 말고, 앞으로 벌어질 사건에 대한 궁금증과 긴장감을 증폭시키는 데 집중해주세요.
+-   구조: 반드시 2개의 문단으로 상황을 묘사한 뒤, 마지막에 별도의 한 줄짜리 핵심 대사를 추가하여 마무리해주세요. (총 2문단 + 1줄 대사)
+-   분량: 전체 글자 수는 400자 이내로 매우 간결하게 작성해주세요.
+-   응답은 반드시 한국어로 작성해주세요. 프롤로그 텍스트만 응답으로 제공해주세요.
   `;
   return generateTextWithGemini(prompt);
 };
@@ -255,126 +116,72 @@ export const generateEndingScenario = async (
   userSuggestion?: string
 ): Promise<string> => {
   const endingDetail = ENDING_DETAILS[endingType];
-  const timeInfo = getEndingTimeInfo(endingType, characterProfile.age);
-  const ageContext = getAgeAppropriateContext(timeInfo.currentAge);
-
   const prompt = `
-당신은 중고등학생을 위한 교육용 시나리오 작가입니다.
-아래 제공된 프롤로그와 게임의 핵심 테마에 이어지는 특정 엔딩 시나리오를 작성해주세요.
+당신은 숙련된 게임 시나리오 작가입니다. 아래 제공된 프롤로그와 게임의 핵심 테마에 이어지는 특정 엔딩 시나리오를 작성해주세요.
 
-## 게임의 핵심 테마
-"${coreTheme}"
-
+게임의 핵심 테마: "${coreTheme}"
 이 핵심 테마가 엔딩 시나리오 전반에 걸쳐 중요한 배경이자 영향을 미치는 요소로 반영되어야 합니다.
 
-## 시간 진행
-- **${timeInfo.yearsLater}년 후**의 미래 상황
-- 프롤로그 캐릭터의 나이: ${characterProfile.age} → **${timeInfo.currentAge}** (${ageContext.description})
-
-## 주인공 정보
+주인공 정보:
 -   ${characterProfile.name ? `이름: "${characterProfile.name}". 이 이름을 시나리오에 자연스럽게 사용해주세요.` : '이름이 정해지지 않았습니다. 이름 없이 서술해주세요.'}
--   현재 연령대: **${timeInfo.currentAge}** (${ageContext.description})
--   성별: ${characterProfile.gender}
--   국적: ${characterProfile.nationality}
+-   성별: ${characterProfile.gender}, 나이: ${characterProfile.age}, 국적: ${characterProfile.nationality}, 의상: ${characterProfile.outfit}
 
-## 교육 목표
-이 엔딩을 통해 학생들이 다음을 이해하도록 해야 합니다:
-- 선택과 행동의 결과 (인과관계)
-- 탄소중립 문제의 복잡성
-- 미래에 대한 책임감
-
-## 기존 프롤로그
+기존 프롤로그:
 ---
 ${prologue}
 ---
 
-## 배경 설정
+배경 설정 (이 설정을 시나리오에 자연스럽게 녹여내어 묘사해주세요):
 -   공간: ${background.space}
 -   날씨: ${background.weather}
 -   시간대: ${background.timeOfDay}
 -   분위기: ${background.mood}
 
-이 배경이 ${timeInfo.yearsLater}년 후 어떻게 변화했는지 자연스럽게 묘사하세요.
+작성할 엔딩의 상세 내용 (이것이 주요 지시사항입니다):
+1.  엔딩 제목: "${endingDetail.title}"
+2.  엔딩 지시사항: "${endingDetail.promptInfo}" 
 
-## 엔딩 유형: ${endingDetail.title}
+${userSuggestion ? `사용자 추가 구체화 의견: "${userSuggestion}"\n위 엔딩 지시사항에 이 의견을 창의적으로 통합하여 엔딩을 더욱 풍부하게 만들어주세요.` : ''}
 
-### 상세 지침
-${endingDetail.promptInfo}
-
-${userSuggestion ? `
-### 사용자 추가 아이디어
-"${userSuggestion}"
-
-**주의**: 위 아이디어를 반영하되, 반드시 탄소 배출 및 '${coreTheme}' 테마와 연결되도록 하세요.
-탄소 문제와 무관한 내용(외계인, 마법, 핵전쟁 등)은 배제하고, 현실적이고 과학적 근거에 기반한 시나리오를 작성하세요.
-` : ''}
-
-## 작성 지침
-
-### 1. 프롤로그와의 연속성
-- 프롤로그의 전조 증상이 ${timeInfo.yearsLater}년 후 어떻게 발전했는지 명확히 연결
-- 인과관계를 설득력 있게 제시
-- 캐릭터의 나이 변화 반드시 반영: ${characterProfile.age} → ${timeInfo.currentAge} (${ageContext.description})
-
-### 2. 엔딩 분위기
-- **중요**: 시나리오 본문에 "${endingDetail.title}", "성공", "실패" 같은 직접적 단어 사용 금지
-- 상황 묘사를 통해 자연스럽게 분위기 전달
-
-### 3. 구조 및 분량
-
-**[문단 1]** (150-200자)
-- ${timeInfo.yearsLater}년 후의 세계 모습
-- '${coreTheme}' 문제의 현재 상태
-- 프롤로그와 비교되는 변화
-
-**[문단 2]** (150-200자)
-- 캐릭터의 현재 모습과 감정
-- 다른 인물과의 대화 (엔딩 주제 반영)
-- 엔딩에 맞는 감정 표현 (성취감/후회/갈등)
-
-**[핵심 대사]** (30자 이내, 따옴표로 묶기)
-- 엔딩의 감정을 함축하는 한 줄
-
-### 4. 출력 형식
-- 한국어로 작성
-- 엔딩 시나리오 텍스트만 출력 (다른 설명 없이)
-- 총 400자 이내
-- 문단 구분은 줄바꿈으로 표시
-
----
-
-위 지침을 따라 ${endingDetail.title} 엔딩을 작성해주세요.
+요청사항:
+-   엔딩은 프롤로그의 내용과 분위기를 자연스럽게 이어받아야 합니다. 프롤로그에서 시작된 사건들이 어떤 과정을 거쳐 이 엔딩에 도달하게 되었는지, 그 인과관계를 설득력 있게 보여주어야 합니다.
+-   지정된 엔딩 지시사항과 게임의 핵심 테마, 그리고 사용자의 추가 의견(제공된 경우)을 충실히 반영하여, 그 결과가 만들어내는 상황과 감정을 심도 있게 묘사해주세요.
+-   중요: 시나리오 본문에는 '${endingDetail.title}'과 같은 엔딩 제목이나 '성공', '실패' 같은 직접적인 단어를 사용하지 마세요. 상황 묘사를 통해 자연스럽게 엔딩의 분위기를 전달해야 합니다.
+-   엔딩은 플레이어에게 깊은 여운을 남기는, 명확하고 완결성 있는 결말을 제공해야 합니다.
+-   구조: 반드시 2개의 문단으로 상황을 묘사한 뒤, 마지막에 그 엔딩의 감정을 함축하는 별도의 한 줄짜리 핵심 대사를 추가하여 마무리해주세요. (총 2문단 + 1줄 대사)
+-   분량: 전체 글자 수는 400자 이내로 매우 간결하게 작성해주세요.
+-   응답은 반드시 한국어로 작성해주세요. 해당 엔딩 시나리오 텍스트만 응답으로 제공해주세요.
   `;
   return generateTextWithGemini(prompt);
 };
 
 const translateToEnglish = (profile: CharacterProfile) => {
   const translations = {
-    gender: { '남': 'male', '여': 'female' } as Record<string, string>,
-    age: { '어린이': 'child', '청소년': 'teenager', '청년': 'young adult', '중년': 'middle-aged adult', '노년': 'elderly person' } as Record<string, string>,
-    nationality: { '한국': 'Korean', '유럽': 'European', '아프리카': 'African', '중앙아시아': 'Central Asian' } as Record<string, string>,
-    outfit: { '캐쥬얼': 'casual clothes', '후드티': 'a hoodie', '전통의상': 'traditional clothes' } as Record<string, string>,
-    artStyle: { '애니메이션': 'anime style', '반실사': 'semi-realistic style', '수채화': 'watercolor painting style', '픽셀아트': 'pixel art style', 'SD캐릭터': 'chibi (SD) style' } as Record<string, string>
+    gender: { '남': 'male', '여': 'female' },
+    age: { '어린이': 'child', '청소년': 'teenager', '청년': 'young adult', '중년': 'middle-aged adult', '노년': 'elderly person' },
+    nationality: { '한국': 'Korean', '유럽': 'European', '아프리카': 'African', '중앙아시아': 'Central Asian' },
+    outfit: { '캐쥬얼': 'casual clothes', '후드티': 'a hoodie', '전통의상': 'traditional clothes' },
+    artStyle: { '애니메이션': 'anime style', '반실사': 'semi-realistic style', '수채화': 'watercolor painting style', '픽셀아트': 'pixel art style', 'SD캐릭터': 'chibi (SD) style' }
   };
 
   return {
-    gender: translations.gender[profile.gender] || profile.gender,
-    age: translations.age[profile.age] || profile.age,
-    nationality: translations.nationality[profile.nationality] || profile.nationality,
-    outfit: translations.outfit[profile.outfit] || profile.outfit,
-    artStyle: translations.artStyle[profile.artStyle] || profile.artStyle
+    gender: translations.gender[profile.gender as keyof typeof translations.gender] || profile.gender,
+    age: translations.age[profile.age as keyof typeof translations.age] || profile.age,
+    nationality: translations.nationality[profile.nationality as keyof typeof translations.nationality] || profile.nationality,
+    outfit: translations.outfit[profile.outfit as keyof typeof translations.outfit] || profile.outfit,
+    artStyle: translations.artStyle[profile.artStyle as keyof typeof translations.artStyle] || profile.artStyle
   };
 };
 
 const translateBackgroundToEnglish = (profile: BackgroundProfile) => {
     const translations = {
-        space: { '도시': 'city', '시골': 'countryside', '집': 'house interior', '학교': 'school', '공원': 'park' } as Record<string, string>,
-        weather: { '맑음': 'clear sky', '흐림': 'cloudy', '비': 'rainy', '눈': 'snowy', '안개': 'foggy' } as Record<string, string>,
-        timeOfDay: { '새벽': 'dawn', '아침': 'morning', '낮': 'daytime', '해질녘': 'sunset', '밤': 'night' } as Record<string, string>,
-        mood: { '평화로운': 'peaceful', '활기찬': 'vibrant', '공허한': 'empty, desolate', '긴박한': 'tense, urgent' } as Record<string, string>
+        space: { '도시': 'city', '시골': 'countryside', '집': 'house interior', '학교': 'school', '공원': 'park' },
+        weather: { '맑음': 'clear sky', '흐림': 'cloudy', '비': 'rainy', '눈': 'snowy', '안개': 'foggy' },
+        timeOfDay: { '새벽': 'dawn', '아침': 'morning', '낮': 'daytime', '해질녘': 'sunset', '밤': 'night' },
+        mood: { '평화로운': 'peaceful', '활기찬': 'vibrant', '공허한': 'empty, desolate', '긴박한': 'tense, urgent' }
     };
 
-    const compositionMap: Record<number, string> = {
+    const compositionMap: { [key: number]: string } = {
         1: 'extreme close-up shot of the character, focusing on face and expression',
         2: 'close-up shot, from the chest up',
         3: 'medium full shot, character from head to toe is visible with some background elements',
@@ -383,101 +190,14 @@ const translateBackgroundToEnglish = (profile: BackgroundProfile) => {
     };
 
     return {
-        space: translations.space[profile.space] || profile.space,
-        weather: translations.weather[profile.weather] || profile.weather,
-        timeOfDay: translations.timeOfDay[profile.timeOfDay] || profile.timeOfDay,
-        mood: translations.mood[profile.mood] || profile.mood,
+        space: translations.space[profile.space as keyof typeof translations.space] || profile.space,
+        weather: translations.weather[profile.weather as keyof typeof translations.weather] || profile.weather,
+        timeOfDay: translations.timeOfDay[profile.timeOfDay as keyof typeof translations.timeOfDay] || profile.timeOfDay,
+        mood: translations.mood[profile.mood as keyof typeof translations.mood] || profile.mood,
         composition: compositionMap[profile.composition] || 'medium shot'
     };
 };
 
-
-// 직접 이미지 프롬프트 생성 (API 호출 없이)
-export const generateImagePromptDirect = (
-  scenarioText: string,
-  scenarioType: 'prologue' | 'ending',
-  characterProfile: CharacterProfile,
-  background: BackgroundProfile,
-  endingTitle?: string
-): string => {
-  const engProfile = translateToEnglish(characterProfile);
-  const engBackground = translateBackgroundToEnglish(background);
-
-  // 기본 캐릭터 설명
-  const characterDesc = `A ${engProfile.age} ${engProfile.nationality} ${engProfile.gender}${characterProfile.name ? ` named ${characterProfile.name}` : ''}, wearing ${engProfile.outfit}`;
-
-  // 안전 지침
-  const safetyNote = "modest, non-revealing, family-friendly clothing";
-
-  // 시나리오 타입별 분위기 설정
-  let sceneDescription = "";
-  let emotionalTone = "";
-  let visualElements = "";
-
-  if (scenarioType === 'prologue') {
-    sceneDescription = "Before the main crisis, showing early warning signs of environmental problems";
-    emotionalTone = "peaceful yet subtly anxious atmosphere";
-    visualElements = "subtle signs of climate change, like unusual weather patterns or environmental anomalies";
-  } else {
-    // 엔딩 타입별 분위기
-    if (endingTitle?.includes('탄소중립 성공') || endingTitle?.includes('탄소 중립 성공')) {
-      sceneDescription = "A future where carbon neutrality has been achieved";
-      emotionalTone = "hopeful, bright, and optimistic atmosphere";
-      visualElements = "clean energy infrastructure, recovered ecosystems, thriving green cities";
-    } else if (endingTitle?.includes('탄소 중립 실패') || endingTitle?.includes('탄소중립 실패')) {
-      sceneDescription = "A dystopian future where carbon emissions caused catastrophic climate disaster";
-      emotionalTone = "dark, desperate, and regretful atmosphere";
-      visualElements = "environmental devastation, extreme weather damage, struggling survivors";
-    } else {
-      // 행복도 관리 실패
-      sceneDescription = "A conflicted future where climate policies failed due to social unrest";
-      emotionalTone = "tense, uncertain, and melancholic atmosphere";
-      visualElements = "social conflict, abandoned environmental projects, divided communities";
-    }
-  }
-
-  // 캐릭터 표정 및 행동
-  let characterExpression = "";
-  if (scenarioType === 'prologue') {
-    characterExpression = "concerned expression, looking at the changing environment with worry";
-  } else {
-    if (endingTitle?.includes('탄소중립 성공') || endingTitle?.includes('탄소 중립 성공')) {
-      characterExpression = "relieved smile, hopeful eyes gazing at the restored world";
-    } else if (endingTitle?.includes('탄소 중립 실패') || endingTitle?.includes('탄소중립 실패')) {
-      characterExpression = "sorrowful eyes, regretful expression, weary posture";
-    } else {
-      // 행복도 관리 실패
-      characterExpression = "conflicted emotions, troubled gaze, showing inner turmoil";
-    }
-  }
-
-  // 조명 및 색상
-  let lightingAndColor = "";
-  if (scenarioType === 'prologue') {
-    lightingAndColor = "natural lighting with subtle dramatic shadows";
-  } else {
-    if (endingTitle?.includes('탄소중립 성공') || endingTitle?.includes('탄소 중립 성공')) {
-      lightingAndColor = "vibrant colors, soft golden hour lighting, warm and inviting tones";
-    } else if (endingTitle?.includes('탄소 중립 실패') || endingTitle?.includes('탄소중립 실패')) {
-      lightingAndColor = "muted, desaturated color palette, dramatic high-contrast lighting, dark and gloomy atmosphere";
-    } else {
-      // 행복도 관리 실패
-      lightingAndColor = "cool tones, overcast lighting, subdued colors reflecting uncertainty";
-    }
-  }
-
-  // 최종 프롬프트 조합
-  const finalPrompt = `${engProfile.artStyle}, ${engBackground.composition}.
-${characterDesc} with ${safetyNote}, ${characterExpression}.
-Setting: ${engBackground.space}, ${engBackground.weather}, ${engBackground.timeOfDay}.
-Scene: ${sceneDescription}.
-Mood: ${engBackground.mood}, ${emotionalTone}.
-Visual elements: ${visualElements}.
-Lighting: ${lightingAndColor}.
-Cinematic composition, highly detailed, professional illustration, focus on environmental storytelling`.replace(/\s+/g, ' ').trim();
-
-  return finalPrompt;
-};
 
 export const generateImagePromptInternal = async (
   scenarioText: string, 
@@ -614,7 +334,8 @@ export const generateImageFromPrompt = async (
       const reason = textPart?.text ? `모델 응답: ${textPart.text}` : "응답에서 이미지 데이터를 찾을 수 없습니다.";
       return Promise.reject(new Error(`이미지 생성에 실패했습니다. ${reason}`));
     }
-  } catch (error) {
+  } catch (error)
+ {
     console.error("Error calling Gemini API for image generation:", error);
      if (error instanceof Error) {
       return Promise.reject(new Error(`Gemini API 이미지 생성 중 오류 발생: ${error.message}`));
