@@ -31,7 +31,9 @@ const App: React.FC = () => {
   const [isPrologueGenerated, setIsPrologueGenerated] = useState<boolean>(false);
   const [prologueImage, setPrologueImage] = useState<ImageState>({ isLoading: false, isGenerated: false, error: null, skipped: false });
   
-  const [endings, setEndings] = useState<EndingContent[]>(JSON.parse(JSON.stringify(INITIAL_ENDING_CONTENT)));
+  const [endings, setEndings] = useState<EndingContent[]>(
+    INITIAL_ENDING_CONTENT.map(e => ({ ...e, image: { ...e.image } }))
+  );
   const [currentEndingIndex, setCurrentEndingIndex] = useState<number>(0);
   const [userEndingSuggestion, setUserEndingSuggestion] = useState<string>(''); 
 
@@ -51,7 +53,7 @@ const App: React.FC = () => {
     const pageIndex = STEPS.findIndex(step => step.id === currentPage);
     if (pageIndex !== -1) return pageIndex;
     if (currentPage === AppPage.INTRODUCTION) return -1;
-    return STEPS.length -1;
+    return STEPS.length - 1;
   }, [currentPage]);
 
   const handleError = (err: unknown) => {
@@ -230,7 +232,7 @@ const App: React.FC = () => {
     setPrologue('');
     setIsPrologueGenerated(false);
     setPrologueImage({ isLoading: false, isGenerated: false, error: null, skipped: false });
-    setEndings(JSON.parse(JSON.stringify(INITIAL_ENDING_CONTENT))); 
+    setEndings(INITIAL_ENDING_CONTENT.map(e => ({ ...e, image: { ...e.image } }))); 
     setCurrentEndingIndex(0);
     setUserEndingSuggestion(''); 
     navigateToPage(AppPage.INTRODUCTION);

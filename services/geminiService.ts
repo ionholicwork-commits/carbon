@@ -157,31 +157,31 @@ ${userSuggestion ? `사용자 추가 구체화 의견: "${userSuggestion}"\n위 
 
 const translateToEnglish = (profile: CharacterProfile) => {
   const translations = {
-    gender: { '남': 'male', '여': 'female' },
-    age: { '어린이': 'child', '청소년': 'teenager', '청년': 'young adult', '중년': 'middle-aged adult', '노년': 'elderly person' },
-    nationality: { '한국': 'Korean', '유럽': 'European', '아프리카': 'African', '중앙아시아': 'Central Asian' },
-    outfit: { '캐쥬얼': 'casual clothes', '후드티': 'a hoodie', '전통의상': 'traditional clothes' },
-    artStyle: { '애니메이션': 'anime style', '반실사': 'semi-realistic style', '수채화': 'watercolor painting style', '픽셀아트': 'pixel art style', 'SD캐릭터': 'chibi (SD) style' }
+    gender: { '남': 'male', '여': 'female' } as Record<string, string>,
+    age: { '어린이': 'child', '청소년': 'teenager', '청년': 'young adult', '중년': 'middle-aged adult', '노년': 'elderly person' } as Record<string, string>,
+    nationality: { '한국': 'Korean', '유럽': 'European', '아프리카': 'African', '중앙아시아': 'Central Asian' } as Record<string, string>,
+    outfit: { '캐쥬얼': 'casual clothes', '후드티': 'a hoodie', '전통의상': 'traditional clothes' } as Record<string, string>,
+    artStyle: { '애니메이션': 'anime style', '반실사': 'semi-realistic style', '수채화': 'watercolor painting style', '픽셀아트': 'pixel art style', 'SD캐릭터': 'chibi (SD) style' } as Record<string, string>
   };
 
   return {
-    gender: translations.gender[profile.gender as keyof typeof translations.gender] || profile.gender,
-    age: translations.age[profile.age as keyof typeof translations.age] || profile.age,
-    nationality: translations.nationality[profile.nationality as keyof typeof translations.nationality] || profile.nationality,
-    outfit: translations.outfit[profile.outfit as keyof typeof translations.outfit] || profile.outfit,
-    artStyle: translations.artStyle[profile.artStyle as keyof typeof translations.artStyle] || profile.artStyle
+    gender: translations.gender[profile.gender] || profile.gender,
+    age: translations.age[profile.age] || profile.age,
+    nationality: translations.nationality[profile.nationality] || profile.nationality,
+    outfit: translations.outfit[profile.outfit] || profile.outfit,
+    artStyle: translations.artStyle[profile.artStyle] || profile.artStyle
   };
 };
 
 const translateBackgroundToEnglish = (profile: BackgroundProfile) => {
     const translations = {
-        space: { '도시': 'city', '시골': 'countryside', '집': 'house interior', '학교': 'school', '공원': 'park' },
-        weather: { '맑음': 'clear sky', '흐림': 'cloudy', '비': 'rainy', '눈': 'snowy', '안개': 'foggy' },
-        timeOfDay: { '새벽': 'dawn', '아침': 'morning', '낮': 'daytime', '해질녘': 'sunset', '밤': 'night' },
-        mood: { '평화로운': 'peaceful', '활기찬': 'vibrant', '공허한': 'empty, desolate', '긴박한': 'tense, urgent' }
+        space: { '도시': 'city', '시골': 'countryside', '집': 'house interior', '학교': 'school', '공원': 'park' } as Record<string, string>,
+        weather: { '맑음': 'clear sky', '흐림': 'cloudy', '비': 'rainy', '눈': 'snowy', '안개': 'foggy' } as Record<string, string>,
+        timeOfDay: { '새벽': 'dawn', '아침': 'morning', '낮': 'daytime', '해질녘': 'sunset', '밤': 'night' } as Record<string, string>,
+        mood: { '평화로운': 'peaceful', '활기찬': 'vibrant', '공허한': 'empty, desolate', '긴박한': 'tense, urgent' } as Record<string, string>
     };
 
-    const compositionMap: { [key: number]: string } = {
+    const compositionMap: Record<number, string> = {
         1: 'extreme close-up shot of the character, focusing on face and expression',
         2: 'close-up shot, from the chest up',
         3: 'medium full shot, character from head to toe is visible with some background elements',
@@ -190,10 +190,10 @@ const translateBackgroundToEnglish = (profile: BackgroundProfile) => {
     };
 
     return {
-        space: translations.space[profile.space as keyof typeof translations.space] || profile.space,
-        weather: translations.weather[profile.weather as keyof typeof translations.weather] || profile.weather,
-        timeOfDay: translations.timeOfDay[profile.timeOfDay as keyof typeof translations.timeOfDay] || profile.timeOfDay,
-        mood: translations.mood[profile.mood as keyof typeof translations.mood] || profile.mood,
+        space: translations.space[profile.space] || profile.space,
+        weather: translations.weather[profile.weather] || profile.weather,
+        timeOfDay: translations.timeOfDay[profile.timeOfDay] || profile.timeOfDay,
+        mood: translations.mood[profile.mood] || profile.mood,
         composition: compositionMap[profile.composition] || 'medium shot'
     };
 };
