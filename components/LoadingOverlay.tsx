@@ -11,8 +11,15 @@ const LoadingOverlay: React.FC<LoadingOverlayProps> = ({ isVisible }) => {
   }
 
   return (
-    <div className="absolute inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center z-10 rounded-lg">
-      <LoadingSpinner text="AI 생성 중..." />
+    <div
+      className="absolute inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center z-10 rounded-lg animate-fadeIn backdrop-blur-sm"
+      role="status"
+      aria-live="polite"
+      aria-label="콘텐츠 로딩 중"
+    >
+      <div className="animate-scaleIn">
+        <LoadingSpinner text="AI 생성 중..." />
+      </div>
     </div>
   );
 };

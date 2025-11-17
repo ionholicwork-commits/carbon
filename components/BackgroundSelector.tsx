@@ -63,7 +63,7 @@ const BackgroundSelector: React.FC<BackgroundSelectorProps> = ({ profile, onChan
               }
             }}
             disabled={isProcessing}
-            className={`px-3 py-1.5 text-sm rounded-md transition-colors disabled:opacity-50 ${selectedValue === option ? 'bg-sky-600 text-white shadow-md' : 'bg-gray-700 hover:bg-gray-600'}`}
+            className={`px-3 py-1.5 text-sm rounded-md transition-all duration-200 disabled:opacity-50 ${selectedValue === option ? 'bg-sky-600 text-white shadow-lg scale-105' : 'bg-gray-700 hover:bg-gray-600 hover:shadow-md'}`}
           >
             {option}
           </button>
@@ -73,7 +73,7 @@ const BackgroundSelector: React.FC<BackgroundSelectorProps> = ({ profile, onChan
             type="button"
             onClick={() => handleOptionChange(field as 'space' | 'weather' | 'mood', '기타', options, setOtherState)}
             disabled={isProcessing}
-            className={`px-3 py-1.5 text-sm rounded-md transition-colors disabled:opacity-50 ${selectedValue === '기타' || !options.includes(selectedValue) ? 'bg-sky-600 text-white shadow-md' : 'bg-gray-700 hover:bg-gray-600'}`}
+            className={`px-3 py-1.5 text-sm rounded-md transition-all duration-200 disabled:opacity-50 ${selectedValue === '기타' || !options.includes(selectedValue) ? 'bg-sky-600 text-white shadow-lg scale-105' : 'bg-gray-700 hover:bg-gray-600 hover:shadow-md'}`}
           >
             기타
           </button>
@@ -85,7 +85,7 @@ const BackgroundSelector: React.FC<BackgroundSelectorProps> = ({ profile, onChan
           value={otherValue}
           onChange={(e) => handleOtherInputChange(field as 'space' | 'weather' | 'mood', e.target.value, setOtherState)}
           placeholder={`${label} 직접 입력`}
-          className="mt-3 w-full p-2 bg-gray-600 border border-gray-500 rounded-md focus:ring-sky-500 focus:border-sky-500 text-gray-200"
+          className="mt-3 w-full p-3 bg-gray-600 border border-gray-500 rounded-md focus:ring-2 focus:ring-sky-400 focus:border-sky-400 text-gray-200 transition-all duration-200 hover:border-gray-400"
           disabled={isProcessing}
           required
         />
