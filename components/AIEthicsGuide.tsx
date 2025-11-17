@@ -46,20 +46,20 @@ const AIEthicsGuide: React.FC = () => {
   ];
 
   return (
-    <div className="bg-gray-800 border border-gray-600 rounded-lg p-6 w-full" role="region" aria-labelledby="ethics-title">
-      <h3 id="ethics-title" className="text-2xl font-bold text-sky-300 mb-6 text-center">
+    <div className="bg-gray-800 border border-gray-600 rounded-lg p-8 w-full" role="region" aria-labelledby="ethics-title">
+      <h3 id="ethics-title" className="text-2xl sm:text-3xl font-bold text-sky-300 mb-8 text-center leading-tight">
         AI 시나리오 생성기 윤리 가이드
       </h3>
-      <div className="flex flex-col space-y-4">
+      <div className="flex flex-col space-y-6">
         {ethicsData.map((item, index) => (
           <div key={index} className="flex items-start space-x-4">
             <div className="flex-shrink-0 text-sky-400 mt-1">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                 {item.icon}
               </svg>
             </div>
-            <p className="text-gray-300 text-base">
-              <strong className="font-semibold text-sky-300">{item.title}:</strong> {item.description}
+            <p className="text-gray-300 text-base leading-relaxed">
+              <strong className="font-bold text-sky-300">{item.title}:</strong> {item.description}
             </p>
           </div>
         ))}

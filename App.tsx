@@ -362,9 +362,9 @@ const App: React.FC = () => {
     switch (currentPage) {
       case AppPage.INTRODUCTION:
         return (
-          <div className="space-y-6 text-center">
-            <h2 className="text-2xl font-semibold text-sky-300">탄소 배출 테마의 게임 시나리오 생성기</h2>
-            <p className="text-lg text-gray-300">
+          <div className="space-y-8 text-center">
+            <h2 className="text-3xl sm:text-4xl font-bold text-sky-300 leading-tight">탄소 배출 테마의 게임 시나리오 생성기</h2>
+            <p className="text-lg sm:text-xl text-gray-300 leading-relaxed">
               탄소 배출 문제를 주제로 한 독창적인 게임 시나리오를 생성하세요.<br />
               여러분이 탐색한 탄소 배출로 예상되는 핵심 문제 1가지를 선택하여 작성하면<br />
               AI가 멋진 시나리오를 만들어 드릴게요!
@@ -404,33 +404,33 @@ const App: React.FC = () => {
             {/* Top Section: Controls (Left) and Image (Right) */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Left Column: Controls */}
-              <div className="flex flex-col space-y-6 h-full">
-                <div className="space-y-6">
+              <div className="flex flex-col space-y-8 h-full">
+                <div className="space-y-8">
                   {isProloguePage ? (
                     <>
-                      <h3 className="text-lg font-semibold text-sky-200 border-b border-gray-700 pb-2">1단계: 프롤로그 작성</h3>
+                      <h3 className="text-xl font-bold text-sky-200 border-b-2 border-gray-700 pb-3">1단계: 프롤로그 작성</h3>
                       <div>
-                        <label htmlFor="coreTheme" className="block text-sm font-medium text-sky-300 mb-1">게임 핵심 테마 (탄소배출 관련 문제)</label>
-                        <textarea id="coreTheme" value={coreTheme} onChange={(e) => setCoreTheme(e.target.value)} placeholder="예: 해수면 상승으로 인한 도시 침몰" rows={3} disabled={isProcessing} className="w-full p-3 bg-gray-700 border border-gray-600 rounded-md focus:ring-sky-500 focus:border-sky-500 text-gray-200 placeholder-gray-500" />
+                        <label htmlFor="coreTheme" className="block text-base font-semibold text-sky-300 mb-2">게임 핵심 테마 (탄소배출 관련 문제)</label>
+                        <textarea id="coreTheme" value={coreTheme} onChange={(e) => setCoreTheme(e.target.value)} placeholder="예: 해수면 상승으로 인한 도시 침몰" rows={3} disabled={isProcessing} className="w-full p-4 bg-gray-700 border border-gray-600 rounded-md focus:ring-sky-500 focus:border-sky-500 text-gray-200 placeholder-gray-500 leading-relaxed" />
                       </div>
                       <BackgroundSelector profile={background} onChange={setBackground} isProcessing={isProcessing} />
                     </>
                   ) : (
                     <>
-                       <h3 className="text-lg font-semibold text-sky-200 border-b border-gray-700 pb-2">1단계: 엔딩 작성</h3>
-                      <div className="p-4 bg-gray-700 rounded-md">
-                        <h3 className="text-lg font-semibold text-sky-300">현재 엔딩 주제: {currentEnding.title}</h3>
-                        <p className="text-gray-300">{currentEnding.description}</p>
+                       <h3 className="text-xl font-bold text-sky-200 border-b-2 border-gray-700 pb-3">1단계: 엔딩 작성</h3>
+                      <div className="p-5 bg-gray-700 rounded-md">
+                        <h3 className="text-lg font-bold text-sky-300 mb-2">현재 엔딩 주제: {currentEnding.title}</h3>
+                        <p className="text-base text-gray-300 leading-relaxed">{currentEnding.description}</p>
                       </div>
                       <div>
-                        <label htmlFor="userEndingSuggestion" className="block text-sm font-medium text-sky-300 mb-1">(선택) 구체적인 아이디어를 추가해보세요</label>
-                        <textarea id="userEndingSuggestion" value={userEndingSuggestion} onChange={(e) => setUserEndingSuggestion(e.target.value)} placeholder="예: 특정 기술의 발전, 예상치 못한 사회적 변화" rows={3} disabled={isProcessing} className="w-full p-3 bg-gray-700 border border-gray-600 rounded-md focus:ring-sky-500 focus:border-sky-500 text-gray-200 placeholder-gray-500" />
+                        <label htmlFor="userEndingSuggestion" className="block text-base font-semibold text-sky-300 mb-2">(선택) 구체적인 아이디어를 추가해보세요</label>
+                        <textarea id="userEndingSuggestion" value={userEndingSuggestion} onChange={(e) => setUserEndingSuggestion(e.target.value)} placeholder="예: 특정 기술의 발전, 예상치 못한 사회적 변화" rows={3} disabled={isProcessing} className="w-full p-4 bg-gray-700 border border-gray-600 rounded-md focus:ring-sky-500 focus:border-sky-500 text-gray-200 placeholder-gray-500 leading-relaxed" />
                       </div>
                        <BackgroundSelector profile={background} onChange={setBackground} isProcessing={isProcessing} />
                     </>
                   )}
                 </div>
-                <div className="mt-auto pt-6 flex items-center h-[72px]">
+                <div className="mt-auto pt-8 flex items-center h-[72px]">
                   {isProloguePage ? (
                      <Button onClick={handleGeneratePrologue} isLoading={isLoadingText} disabled={isProcessing || !coreTheme.trim()} className="w-full">
                         {isPrologueGenerated ? "프롤로그 재생성" : "프롤로그 생성"}
@@ -457,13 +457,13 @@ const App: React.FC = () => {
                       }
                     />
                  </div>
-                <div className="mt-auto pt-6 h-[158px]">
-                  {targetImage?.error && <Alert message={targetImage.error} type="error" onClose={isProloguePage ? clearPrologueImageError : () => clearEndingImageError(currentEndingIndex)} className="mb-2" />}
-                  
+                <div className="mt-auto pt-8 h-[158px]">
+                  {targetImage?.error && <Alert message={targetImage.error} type="error" onClose={isProloguePage ? clearPrologueImageError : () => clearEndingImageError(currentEndingIndex)} className="mb-3" />}
+
                   {isTextGenerated && (
-                    <div className="space-y-4">
-                      <h3 className="text-lg font-semibold text-sky-200 border-b border-gray-700 pb-2 text-center">2단계: 이미지 생성</h3>
-                      <div className="space-y-2">
+                    <div className="space-y-5">
+                      <h3 className="text-xl font-bold text-sky-200 border-b-2 border-gray-700 pb-3 text-center">2단계: 이미지 생성</h3>
+                      <div className="space-y-3">
                         <Button onClick={isProloguePage ? handleGeneratePrologueImage : handleGenerateCurrentEndingImage} isLoading={targetImage?.isLoading} disabled={isProcessing} className="w-full">
                           {targetImage?.isGenerated || targetImage?.url ? "이미지 재생성" : "이미지 생성"}
                         </Button>
@@ -480,8 +480,8 @@ const App: React.FC = () => {
             </div>
 
             {/* Bottom Section: Scenario Text */}
-            <div className="mt-8">
-              <ScenarioDisplay 
+            <div className="mt-10">
+              <ScenarioDisplay
                 title={isProloguePage ? "프롤로그" : `${currentEnding.title}`}
                 text={targetText}
                 isLoading={isLoadingText && !isTextGenerated}
@@ -489,7 +489,7 @@ const App: React.FC = () => {
             </div>
 
             {/* Page Navigation Bar */}
-            <div className="mt-8 pt-6 border-t border-gray-700 flex justify-between items-center">
+            <div className="mt-10 pt-8 border-t border-gray-700 flex justify-between items-center">
               {/* Back Button */}
               <Button 
                 onClick={handlePrevious}
@@ -521,24 +521,24 @@ const App: React.FC = () => {
 
       case AppPage.FULL_SCENARIO:
         return (
-          <div className="space-y-10">
+          <div className="space-y-12">
             <div>
-              <h2 className="text-2xl font-semibold text-sky-400 mb-2">게임 핵심 테마</h2>
-              <p className="text-gray-300 bg-gray-700 p-3 rounded-md mb-6">{coreTheme || "핵심 테마가 설정되지 않았습니다."}</p>
+              <h2 className="text-3xl font-bold text-sky-400 mb-4">게임 핵심 테마</h2>
+              <p className="text-base text-gray-300 bg-gray-700 p-4 rounded-md mb-8 leading-relaxed">{coreTheme || "핵심 테마가 설정되지 않았습니다."}</p>
               <ScenarioDisplay title="프롤로그" text={prologue} placeholder="프롤로그가 생성되지 않았습니다." />
-              {(prologueImage.isGenerated || prologueImage.url) && prologueImage.url && <ImageDisplay imageUrl={prologueImage.url} altText="프롤로그 이미지" className="mt-4" title="프롤로그 이미지" downloadFileName="1_prologue.jpg" />}
-              {prologueImage.error && !prologueImage.url && <Alert message={`프롤로그 이미지 생성 실패: ${prologueImage.error}`} type="error" className="mt-2"/>}
+              {(prologueImage.isGenerated || prologueImage.url) && prologueImage.url && <ImageDisplay imageUrl={prologueImage.url} altText="프롤로그 이미지" className="mt-5" title="프롤로그 이미지" downloadFileName="1_prologue.jpg" />}
+              {prologueImage.error && !prologueImage.url && <Alert message={`프롤로그 이미지 생성 실패: ${prologueImage.error}`} type="error" className="mt-3"/>}
             </div>
-            
+
             {endings.map((ending, index) => (
               <div key={ending.type}>
                 <ScenarioDisplay title={`${index + 1}. ${ending.title}`} text={ending.scenario} placeholder={`${ending.title} 엔딩이 생성되지 않았습니다.`} />
-                 <p className="mt-2 text-sm text-gray-400">주제: {ending.description}</p>
-                {(ending.image.isGenerated || ending.image.url) && ending.image.url && <ImageDisplay imageUrl={ending.image.url} altText={`${ending.title} 이미지`} className="mt-4" title = {`${ending.title} 이미지`} downloadFileName={`${index + 2}_${ending.type}.jpg`} />}
-                {ending.image.error && !ending.image.url && <Alert message={`${ending.title} 이미지 생성 실패: ${ending.image.error}`} type="error" className="mt-2"/>}
+                 <p className="mt-3 text-sm text-gray-400">주제: {ending.description}</p>
+                {(ending.image.isGenerated || ending.image.url) && ending.image.url && <ImageDisplay imageUrl={ending.image.url} altText={`${ending.title} 이미지`} className="mt-5" title = {`${ending.title} 이미지`} downloadFileName={`${index + 2}_${ending.type}.jpg`} />}
+                {ending.image.error && !ending.image.url && <Alert message={`${ending.title} 이미지 생성 실패: ${ending.image.error}`} type="error" className="mt-3"/>}
               </div>
             ))}
-            <div className="flex flex-col sm:flex-row justify-center items-center space-y-4 sm:space-y-0 sm:space-x-4 mt-8">
+            <div className="flex flex-col sm:flex-row justify-center items-center space-y-5 sm:space-y-0 sm:space-x-6 mt-10">
               <Button onClick={resetFullScenario} size="lg">새 시나리오 작성</Button>
               <Button onClick={handleDownloadExcel} size="lg" variant="primary">시나리오 Excel 다운로드</Button>
             </div>
