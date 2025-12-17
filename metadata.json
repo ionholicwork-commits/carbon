@@ -1,0 +1,6 @@
+{
+  "name": "carbon_SN",
+  "description": "탄소 배출 문제를 주제로 한 게임 시나리오(프롤로그 및 5가지 엔딩)를 생성하는 웹 애플리케이션입니다. 사용자는 시점과 핵심 테마를 선택하여 Gemini API를 통해 맞춤형 시나리오를 만들 수 있습니다.",
+  "requestFramePermissions": [],
+  "prompt": ""
+}
